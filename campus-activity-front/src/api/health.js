@@ -1,5 +1,3 @@
-import http from './http'
+import request from '@/utils/request'
 
-export function apiHealth() {
-  return http.get('/api/health')
-}
+export const apiHealth = () => request.get('/api/health')
