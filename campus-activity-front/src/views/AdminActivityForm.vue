@@ -1,6 +1,7 @@
 <template>
   <div class="page" style="max-width: 900px;">
     <div class="card">
+      <button class="btn" style="margin-bottom:8px;" @click="$router.back()">返回</button>
       <h2 class="section-title" style="margin:0 0 10px;">创建活动</h2>
       <p class="meta">请填写必填项，时间格式：yyyy-MM-dd HH:mm（示例：2025-12-25 14:00）</p>
     </div>
@@ -38,13 +39,6 @@
       </div>
 
       <div class="form-row" style="margin-top:8px;">
-        <label>海报</label>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <img v-if="form.posterUrl" :src="form.posterUrl" alt="poster" style="width:120px;height:80px;object-fit:cover;border-radius:8px;border:1px solid #eee;" />
-          <input type="file" @change="onPosterChange" />
-        </div>
-      </div>
-      <div class="form-row" style="margin-top:8px;">
         <label>描述</label>
         <textarea class="input" rows="3" v-model="form.description"></textarea>
       </div>
@@ -63,7 +57,6 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { adminCreateActivity } from '@/api/activity'
-import { uploadPoster } from '@/api/file'
 
 const router = useRouter()
 const submitting = ref(false)
@@ -75,22 +68,8 @@ const form = reactive({
   startTime: '',
   endTime: '',
   deadline: '',
-  posterUrl: '',
   description: '',
 })
-
-const onPosterChange = async (e) => {
-  const file = e.target.files?.[0]
-  if (!file) return
-  const fd = new FormData()
-  fd.append('file', file)
-  try {
-    const url = await uploadPoster(fd)
-    form.posterUrl = url
-  } catch (err) {
-    alert(err?.message || '上传失败')
-  }
-}
 
 const fmt = (v) => {
   if (!v) return undefined
@@ -122,7 +101,6 @@ const onSubmit = async () => {
       startTime: fmt(form.startTime),
       endTime: fmt(form.endTime),
       deadline: fmt(form.deadline),
-      posterUrl: form.posterUrl || undefined,
       description: form.description || undefined,
     }
     await adminCreateActivity(payload)

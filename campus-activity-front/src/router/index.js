@@ -5,7 +5,6 @@ import Register from '@/views/Register.vue'
 import ActivitiesView from '@/views/ActivitiesView.vue'
 import ActivityDetail from '@/views/ActivityDetail.vue'
 import MyRegistrations from '@/views/MyRegistrations.vue'
-import AdminDashboard from '@/views/AdminDashboard.vue'
 import AdminRegistrations from '@/views/AdminRegistrations.vue'
 import AdminReview from '@/views/AdminReview.vue'
 import MeProfile from '@/views/MeProfile.vue'
@@ -15,6 +14,7 @@ import AdminActivities from '@/views/AdminActivities.vue'
 import AdminActivityForm from '@/views/AdminActivityForm.vue'
 import AdminAttendance from '@/views/AdminAttendance.vue'
 import AdminReport from '@/views/AdminReport.vue'
+import AdminNotifications from '@/views/AdminNotifications.vue'
 
 const routes = [
   // 默认进入登录页
@@ -67,12 +67,8 @@ const routes = [
     props: true,
     meta: { requiresAuth: true },
   },
-  {
-    path: '/admin',
-    name: 'Admin',
-    component: AdminDashboard,
-    meta: { requiresAuth: true },
-  },
+  // 管理员进入默认跳转到“活动列表”
+  { path: '/admin', redirect: '/activities' },
   {
     path: '/admin/activities',
     name: 'AdminActivities',
@@ -110,6 +106,12 @@ const routes = [
     name: 'AdminReport',
     component: AdminReport,
     props: true,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/notifications',
+    name: 'AdminNotifications',
+    component: AdminNotifications,
     meta: { requiresAuth: true },
   },
 

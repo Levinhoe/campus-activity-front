@@ -14,6 +14,7 @@
           <router-link v-if="role !== 'ADMIN'" to="/me/notifications">通知</router-link>
           <router-link v-if="role === 'ADMIN'" to="/admin/review">报名审核</router-link>
           <router-link v-if="role === 'ADMIN'" to="/admin/activities">活动管理</router-link>
+          <router-link v-if="role === 'ADMIN'" to="/admin/notifications">反馈通知</router-link>
         </nav>
       </aside>
 

@@ -7,6 +7,7 @@
           <p class="meta" style="margin:4px 0 0;">活动 ID：{{ activityId }}｜仅保留审核功能，界面简洁清晰</p>
         </div>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+          <button class="btn" @click="goBack">返回上一页</button>
           <select class="input" style="width:160px;" v-model="status" @change="onChangeStatus">
             <option value="">全部状态</option>
             <option value="PENDING">待审核</option>
@@ -50,6 +51,7 @@
               />
               <div>
                 <div style="font-weight:700;">{{ item.nickname || item.realName || item.userId }}</div>
+                <div class="meta">报名时间：{{ item.registrationTime }}</div>
                 <div class="meta">ID：{{ item.userId }}</div>
               </div>
             </div>
@@ -176,7 +178,11 @@ const onChangeStatus = async () => {
 }
 
 const goBack = () => {
-  router.push(`/activities/${activityId}`)
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/admin/review')
+  }
 }
 
 const approve = async (item) => {

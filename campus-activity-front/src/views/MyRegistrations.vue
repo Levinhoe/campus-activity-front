@@ -29,35 +29,44 @@
           style="padding: 12px;"
         >
           <div style="display:flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
-            <div style="display:flex; gap:12px;">
-              <img
-                v-if="item.cover"
-                :src="item.cover"
-                alt="cover"
-                style="width:80px; height:60px; object-fit: cover; border-radius: 8px; border:1px solid #eee;"
-              />
-              <div>
-                <div style="font-weight:700; font-size:16px;">{{ item.title }}</div>
-                <div class="meta">开始：<strong>{{ item.startTime }}</strong></div>
-                <div class="meta">地点：<strong>{{ item.location }}</strong></div>
-                <div class="meta">报名时间：<strong>{{ item.registrationTime }}</strong></div>
-                <div class="meta">状态：<strong>{{ statusText(item.status) }}</strong></div>
+          <div style="display:flex; gap:12px;">
+            <img
+              v-if="item.cover"
+              :src="item.cover"
+              alt="cover"
+              style="width:80px; height:60px; object-fit: cover; border-radius: 8px; border:1px solid #eee;"
+            />
+            <div>
+              <div style="font-weight:800; font-size:16px; margin-bottom:6px;">
+                活动名称：{{ item.title || item.name || '未知活动' }}
+              </div>
+              <div class="meta">开始：<strong>{{ item.startTime }}</strong></div>
+              <div class="meta">地点：<strong>{{ item.location }}</strong></div>
+              <div class="meta">报名时间：<strong>{{ item.registrationTime }}</strong></div>
+              <div class="meta">状态：<strong>{{ statusText(item.status) }}</strong></div>
                 <div class="meta" v-if="item.reason">原因：{{ item.reason }}</div>
               </div>
             </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-              <button class="btn btn-primary" @click="goDetail(item.activityId)">查看详情</button>
-              <button
-                v-if="item.status === 1 || item.status === 'PENDING' || item.status === 'APPROVED'"
-                class="btn"
-                :disabled="loadingId === item.activityId"
-                @click="onCancel(item.activityId)"
-              >
-                {{ loadingId === item.activityId ? '取消中...' : '取消报名' }}
-              </button>
-            </div>
-          </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn btn-primary" @click="goDetail(item.activityId)">查看详情</button>
+          <button
+            v-if="item.status === 1 || item.status === 'PENDING' || item.status === 'APPROVED'"
+            class="btn"
+            :disabled="loadingId === item.activityId"
+            @click="onCancel(item.activityId)"
+          >
+            {{ loadingId === item.activityId ? '取消中...' : '取消报名' }}
+          </button>
+          <button
+            class="btn"
+            v-if="item.activityId"
+            @click="goSurvey(item.activityId)"
+          >
+            反馈问卷
+          </button>
         </div>
+      </div>
+    </div>
       </div>
 
       <div style="margin-top: 12px; display:flex; gap: 10px; align-items: center; justify-content: flex-end;">
@@ -77,7 +86,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { fetchMyRegistrations, cancelRegistration } from '@/api/registration'
+import { fetchMyRegistrations, cancelRegistration, studentCheckin } from '@/api/registration'
 
 const router = useRouter()
 const list = ref([])
@@ -87,6 +96,7 @@ const total = ref(0)
 const totalPages = ref(1)
 const loading = ref(false)
 const loadingId = ref(null)
+const checkingId = ref(null)
 const status = ref('')
 
 const load = async () => {
@@ -121,7 +131,23 @@ const onCancel = async (id) => {
 }
 
 const goDetail = (id) => {
-  router.push({ path: `/activities/${id}`, query: { readonly: '1' } })
+  router.push({ path: `/activities/${id}`, query: { readonly: '1', from: 'my-registrations' } })
+}
+
+const goSurvey = (id) => {
+  router.push({ path: `/activities/${id}/survey`, query: { from: 'my-registrations' } })
+}
+
+const onCheckin = async (id) => {
+  checkingId.value = id
+  try {
+    await studentCheckin(id, { checkStatus: 'NORMAL' })
+    alert('签到成功')
+  } catch (e) {
+    alert(e?.message || '签到失败')
+  } finally {
+    checkingId.value = null
+  }
 }
 
 const prevPage = async () => {

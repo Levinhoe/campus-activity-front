@@ -16,3 +16,9 @@ export const fetchActivityRegistrations = (activityId, page = 1, size = 10, stat
 
 export const fetchActivityStats = (activityId) =>
   http.get(`/activities/${activityId}/stats`)
+
+// 学生自助签到
+export const studentCheckin = (activityId, payload = {}) => {
+  const checkStatus = payload.checkStatus || payload.status || 'NORMAL'
+  return http.post('/me/checkin', { activityId, checkStatus, ...payload })
+}

@@ -4,11 +4,15 @@
     <div class="card" v-else-if="errorMsg" style="color:#d43f3a;">{{ errorMsg }}</div>
 
     <div class="card" v-else>
+      <button class="btn" style="margin-bottom:8px;" @click="goBack">返回</button>
+      <div style="margin-bottom:12px; font-weight:800; font-size:18px; color:#1b263b; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span class="tag">{{ statusDisplay }}</span>
+        <span>活动名称：{{ detail.title || detail.name || '-' }}</span>
+      </div>
       <div style="display:flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap;">
         <div>
           <h2 class="section-title" style="margin:0;">{{ detail.title }}</h2>
           <div class="meta" style="margin-top: 6px;">
-            <span class="tag">{{ statusDisplay }}</span>
             <span style="margin-left:10px;">分类：<strong>{{ detail.category || '-' }}</strong></span>
             <span style="margin-left:10px;">地点：<strong>{{ detail.location || '-' }}</strong></span>
           </div>
@@ -19,7 +23,7 @@
             报名时间：<strong>{{ stats?.enrollStart || '-' }}</strong> ~ <strong>{{ stats?.enrollDeadline || '-' }}</strong>
           </div>
         </div>
-        <div v-if="!readOnly" style="display:flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <div v-if="!readOnly && !isAdmin" style="display:flex; gap: 10px; align-items: center; flex-wrap: wrap;">
           <button
             v-if="stats?.currentUserRegistered"
             class="btn"
@@ -37,7 +41,7 @@
             {{ btnLoading ? '处理中...' : (disableReason || '报名') }}
           </button>
           <button class="btn" @click="goBack">返回列表</button>
-          <button class="btn" @click="goAdmin" v-if="token">查看报名名单</button>
+          <!-- 查看报名名单按钮删除，避免功能重复 -->
         </div>
       </div>
 
@@ -51,7 +55,7 @@
         {{ detail.description || '暂无描述' }}
       </div>
 
-      <div v-if="!stats?.currentUserRegistered && !readOnly" class="card" style="margin-top:12px; background:#f8fbff;">
+      <div v-if="!stats?.currentUserRegistered && !readOnly && !isAdmin" class="card" style="margin-top:12px; background:#f8fbff;">
         <h4 style="margin:0 0 6px;">报名信息</h4>
         <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
           <div class="form-row">
@@ -95,8 +99,10 @@ const errorMsg = ref('')
 const detail = ref({})
 const stats = ref(null)
 const token = ref(localStorage.getItem('token'))
+const role = ref(localStorage.getItem('role') || '')
 const regForm = ref({ name: '', studentNo: '', phone: '' })
 const readOnly = computed(() => route.query.readonly === '1' || route.query.readonly === 'true')
+const isAdmin = computed(() => (role.value || '').toUpperCase() === 'ADMIN')
 
 const fetchDetail = async () => {
   loading.value = true
@@ -200,6 +206,10 @@ const onCancel = async () => {
 }
 
 const goBack = () => {
+  if (route.query.from === 'my-registrations') {
+    router.push('/me/registrations')
+    return
+  }
   router.push('/activities')
 }
 

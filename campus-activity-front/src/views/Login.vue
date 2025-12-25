@@ -1,6 +1,6 @@
 <template>
-  <div class="page" style="max-width: 560px;">
-    <div class="card">
+  <div class="page login-wrapper">
+    <div class="card login-card">
       <h2 class="section-title" style="margin-bottom: 14px;">登录</h2>
 
       <div class="form-grid">
